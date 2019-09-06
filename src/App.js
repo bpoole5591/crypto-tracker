@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import logo from './logo.png';
+import loader from './loader.gif';
 import './App.css';
 import axios from 'axios';
 
@@ -17,10 +18,23 @@ class App extends Component {
       )
       .then(res => {
         const cryptos = res.data;
-        this.setState({ cryptos: cryptos });
-        console.log(this.state.cryptos);
+        setTimeout(() => {
+          this.setState({ cryptos: cryptos });
+        }, 1000);
       });
   }
+
+  // Format the currency using a Regular Expression
+  // currencyFormat = num => {
+  //   return '$' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+  // };
+
+  // Format the currency using the ECMAScript Internationalization API
+  formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+  });
 
   render() {
     const coinNamer = key => {
@@ -63,23 +77,24 @@ class App extends Component {
               USD Value
             </span>
           </div>
-          {Object.keys(this.state.cryptos).map(key => (
-            <div id="crypto-container" key={key}>
-              <span className="left">
-                {coinNamer(key)} ({key})
-              </span>
-              <span className="right">
-                ${this.state.cryptos[key].USD}
-                {/*<NumberFormat
-                    value={this.state.cryptos[key].USD}
-                    displayType={'text'}
-                    decimalPrecision={2}
-                    thousandSeparator={true}
-                    prefix={'$'}
-                  />*/}
-              </span>
+          {this.state.cryptos.length === 0 ? (
+            <div id="crypto-container" style={{ textAlign: 'center' }}>
+              <img src={loader} alt="loader" style={{ height: '15vh' }} />
             </div>
-          ))}
+          ) : (
+            <div>
+              {Object.keys(this.state.cryptos).map(key => (
+                <div id="crypto-container" key={key}>
+                  <span className="left">
+                    {coinNamer(key)} ({key})
+                  </span>
+                  <span className="right">
+                    {this.formatter.format(this.state.cryptos[key].USD)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     );
