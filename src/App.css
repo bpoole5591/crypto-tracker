@@ -45,6 +45,20 @@ div#crypto-container {
   box-shadow: 1px 1px 0 lightgrey;
 }
 
+#crypto-container input {
+  font-size: 16px;
+  margin: 5px;
+  border-radius: 3px;
+  padding: 5px;
+}
+
+#crypto-container button {
+  font-size: 16px;
+  border-radius: 3px;
+  width: 100px;
+  padding: 5px;
+}
+
 span.left {
   font-weight: bold;
 }

@@ -8,13 +8,19 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { cryptos: [] };
+    this.state = {
+      cryptos: [],
+      name: '',
+      symbol: '',
+      price: ''
+    };
   }
 
   componentDidMount() {
     axios
       .get(
-        'https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,ETC,LTC,EOS,BNB,XRP,BCH,LINK,OKB&tsyms=USD'
+        //'https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,ETC,LTC,EOS,BNB,XRP,BCH,LINK,OKB&tsyms=USD'
+        'https://api.coinmarketcap.com/v1/ticker/?limit=10'
       )
       .then(res => {
         const cryptos = res.data;
@@ -36,32 +42,30 @@ class App extends Component {
     minimumFractionDigits: 2
   });
 
-  render() {
-    const coinNamer = key => {
-      let name = 'whatever';
-      if (key === 'BTC') {
-        name = 'Bitcoin';
-      } else if (key === 'ETH') {
-        name = 'Ethereum';
-      } else if (key === 'ETC') {
-        name = 'Ethereum Classic';
-      } else if (key === 'LTC') {
-        name = 'Litecoin';
-      } else if (key === 'EOS') {
-        name = 'EOS';
-      } else if (key === 'BNB') {
-        name = 'Binance Coin';
-      } else if (key === 'XRP') {
-        name = 'XRP';
-      } else if (key === 'BCH') {
-        name = 'Bitcoin Cash';
-      } else if (key === 'LINK') {
-        name = 'Chainlink';
-      } else if (key === 'OKB') {
-        name = 'Okex';
-      }
-      return name;
+  createCoin = (name, symbol, price) => {
+    const coin = {
+      id: name,
+      name: name,
+      symbol: symbol,
+      price_usd: price
     };
+    const newState = this.state.cryptos
+    newState.push(coin);
+    console.log("state:", this.state)
+    console.log("newstate:", newState);
+    this.setState({ cryptos: newState });
+  }
+
+  deleteCoin = coinId => {
+    const coins = this.state.cryptos;
+    const coinToRemove = coins.find(({ id }) => id === coinId);
+    const newCoins = coins.filter(coin => coin !== coinToRemove);
+    this.setState({ cryptos: newCoins });
+  }
+
+  render() {
+    console.log("state:", this.state.cryptos)
+    const { name, symbol, price } = this.state;
     return (
       <div className="App">
         <header className="App-header">
@@ -83,18 +87,37 @@ class App extends Component {
             </div>
           ) : (
             <div>
-              {Object.keys(this.state.cryptos).map(key => (
-                <div id="crypto-container" key={key}>
-                  <span className="left">
-                    {coinNamer(key)} ({key})
-                  </span>
-                  <span className="right">
-                    {this.formatter.format(this.state.cryptos[key].USD)}
-                  </span>
-                </div>
-              ))}
+
+                {this.state.cryptos.map(key => (
+                  <div id="crypto-container" key={key.symbol}>
+                    <span className="left">{key.name}</span>
+                    <span className="left"> ({key.symbol})</span>
+                    <span className="right">
+                      {this.formatter.format(key.price_usd)}
+                      <button onClick={() => this.deleteCoin(key.id)}>X</button>
+                    </span>
+                  </div>
+
+                ))}
             </div>
-          )}
+            )}
+          <div id="crypto-container">
+            <p>Create Your Own Coin!</p>
+            <span className="left">
+                <input type="text" placeholder="Name" onChange={event => {
+                  this.setState({ name: event.target.value });
+                }}/>
+                <input type="text" placeholder="Symbol" onChange={event => {
+                  this.setState({ symbol: event.target.value });
+                }}/>
+                <input type="text" placeholder="Value" onChange={event => {
+                  this.setState({ price: event.target.value });
+                }}/>
+              <button onClick={() => {
+                this.createCoin(name, symbol, price);
+              }}>Submit</button>
+            </span>
+          </div>
         </div>
       </div>
     );
