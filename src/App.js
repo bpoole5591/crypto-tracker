@@ -82,20 +82,19 @@ class App extends Component {
             </span>
           </div>
           {this.state.cryptos.length === 0 ? (
-            <div id="crypto-container" style={{ textAlign: 'center' }}>
-              <img src={loader} alt="loader" style={{ height: '15vh' }} />
+            <div className="loading">
+              <img src={loader} alt="loader" style={{ width: '30vw' }} />
             </div>
           ) : (
             <div>
 
                 {this.state.cryptos.map(key => (
                   <div id="crypto-container" key={key.symbol}>
-                    <span className="left">{key.name}</span>
-                    <span className="left"> ({key.symbol})</span>
-                    <span className="right">
-                      {this.formatter.format(key.price_usd)}
-                      <button onClick={() => this.deleteCoin(key.id)}>X</button>
-                    </span>
+                    <div className="left">{key.name} ({key.symbol})</div>
+                    <div className="right">{this.formatter.format(key.price_usd)}
+                      <button className="btn-trash" onClick={() => this.deleteCoin(key.id)}><i className="fa fa-trash"></i></button>
+                      <button className="btn-trash" onClick={() => console.log("edit!")}><i className="fa fa-pencil"></i></button>
+                    </div>
                   </div>
 
                 ))}
@@ -103,7 +102,7 @@ class App extends Component {
             )}
           <div id="crypto-container">
             <p>Create Your Own Coin!</p>
-            <span className="left">
+            <div className="left">
                 <input type="text" placeholder="Name" onChange={event => {
                   this.setState({ name: event.target.value });
                 }}/>
@@ -113,10 +112,10 @@ class App extends Component {
                 <input type="text" placeholder="Value" onChange={event => {
                   this.setState({ price: event.target.value });
                 }}/>
-              <button onClick={() => {
+              <button className="btn-submit" onClick={() => {
                 this.createCoin(name, symbol, price);
               }}>Submit</button>
-            </span>
+            </div>
           </div>
         </div>
       </div>
